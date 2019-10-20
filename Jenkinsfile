@@ -25,8 +25,8 @@ node {
          echo 'Cleanup'
 
          mail body: 'Project build successful',
-                     from: 'jenkins@DevOps_Capstone.info',
-                     replyTo: 'jenkins@DevOps_Capstone.info',
+                     from: 'jenkins@DevOpsCapstone.info',
+                     replyTo: 'jenkins@DevOpsCapstone.info',
                      subject: 'SUCCESS',
                      to: 'seidel.florian@gmail.com'
        }
@@ -36,8 +36,8 @@ node {
         currentBuild.result = "FAILURE"
 
         mail body: 'Project build failure',
-                    from: 'jenkins@DevOps_Capstone.info',
-                    replyTo: 'jenkins@DevOps_Capstone.info',
+                    from: 'jenkins@DevOpsCapstone.info',
+                    replyTo: 'jenkins@DevOpsCapstone.info',
                     subject: 'FAILURE',
                     to: 'seidel.florian@gmail.com'
 

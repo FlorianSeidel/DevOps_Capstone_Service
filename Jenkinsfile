@@ -24,22 +24,22 @@ node {
 
          echo 'Cleanup'
 
-         mail body: 'Project build successful',
+         /*mail body: 'Project build successful',
                      from: 'jenkins@DevOpsCapstone.info',
                      replyTo: 'jenkins@DevOpsCapstone.info',
                      subject: 'SUCCESS',
-                     to: 'seidel.florian@gmail.com'
+                     to: 'seidel.florian@gmail.com'*/
        }
     }
     catch (err) {
 
         currentBuild.result = "FAILURE"
 
-        mail body: 'Project build failure',
+        /*mail body: 'Project build failure',
                     from: 'jenkins@DevOpsCapstone.info',
                     replyTo: 'jenkins@DevOpsCapstone.info',
                     subject: 'FAILURE',
-                    to: 'seidel.florian@gmail.com'
+                    to: 'seidel.florian@gmail.com'*/
 
         throw err
     }

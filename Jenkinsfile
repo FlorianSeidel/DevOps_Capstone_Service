@@ -5,8 +5,8 @@ def workdir = "${workspace}/src/localhost/docker-jenkins/"
 
 podTemplate(label: label,
         containers: [
-                containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
-                containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
+                containerTemplate(name: 'jnlp', image: 'cloudbees/jnlp-slave-with-java-build-tools'),
+                containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true)
             ],
         volumes: [
             hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
@@ -21,7 +21,7 @@ podTemplate(label: label,
             }
 
             stage('Build') {
-                container('docker') {
+                container('jnlp') {
                     echo "Building service..."
                     sh "./mvnw package"
                 }

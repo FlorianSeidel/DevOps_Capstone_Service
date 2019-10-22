@@ -8,16 +8,13 @@ podTemplate(
                 containerTemplate(name: 'jnlp',
                                   image: 'florianseidel/capstone-build-slave:latest',
                                   envVars: [
-                                              envVar(key: 'DOCKER_HOST', value: 'tcp://localhost:2375'),
+                                              envVar(key: 'DOCKER_HOST', value: 'tcp://localhost:2375')
                                           ]
-                                  )/*,
-                containerTemplate(name: 'dind', image: 'docker:18.05-dind')*/
-            ]/*,
-            volumes: [
-                emptyDirVolume(mountPath: '/var/lib/docker', memory: false),
-            ],*/
-        )
-/*podTemplate(yaml: """
+                                  )
+            ]
+)
+{
+        podTemplate(yaml: """
 apiVersion: v1
 kind: Pod
 name: test-build-pod
@@ -26,11 +23,6 @@ metadata:
     some-label: ${label}
 spec:
   containers:
-    - name: jnlp
-      image: florianseidel/capstone-build-slave:latest
-      env:
-          - name: DOCKER_HOST
-            value: tcp://localhost:2375
     - name: dind
       image: docker:18.05-dind
       securityContext:
@@ -42,18 +34,20 @@ spec:
     - name: dind-storage
       emptyDir: {}
 """
-)*/ {
-    node(POD_LABEL) {
-        dir(workdir) {
-            stage('Checkout') {
-                timeout(time: 3, unit: 'MINUTES') {
-                    checkout scm
+        ){
+
+            node(POD_LABEL) {
+                dir(workdir) {
+                    stage('Checkout') {
+                        timeout(time: 3, unit: 'MINUTES') {
+                            checkout scm
+                        }
+                    }
+                    stage('Build') {
+                        echo "Building service..."
+                        sh "chmod u+x mvnw &&./mvnw package"
+                    }
                 }
             }
-            stage('Build') {
-                echo "Building service..."
-                sh "chmod u+x mvnw &&./mvnw package"
-            }
         }
-    }
 }

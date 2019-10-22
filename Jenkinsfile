@@ -27,12 +27,12 @@ spec:
           - name: DOCKER_HOST
             value: tcp://localhost:2375
     - name: dind
-        image: docker:18.05-dind
-        securityContext:
-          privileged: true
-        volumeMounts:
-          - name: dind-storage
-            mountPath: /var/lib/docker
+      image: docker:18.05-dind
+      securityContext:
+      privileged: true
+      volumeMounts:
+        - name: dind-storage
+          mountPath: /var/lib/docker
   volumes:
     - name: dind-storage
       emptyDir: {}

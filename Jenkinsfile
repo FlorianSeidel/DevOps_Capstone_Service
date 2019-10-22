@@ -10,12 +10,12 @@ podTemplate(
                                   envVars: [
                                               envVar(key: 'DOCKER_HOST', value: 'tcp://localhost:2375'),
                                           ]
-                                  ),
-                containerTemplate(name: 'dind', image: 'docker:18.05-dind')
-            ],
+                                  )/*,
+                containerTemplate(name: 'dind', image: 'docker:18.05-dind')*/
+            ]/*,
             volumes: [
                 emptyDirVolume(mountPath: '/var/lib/docker', memory: false),
-            ],
+            ],*/
         )
 /*podTemplate(yaml: """
 apiVersion: v1

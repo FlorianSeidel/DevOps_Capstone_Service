@@ -43,7 +43,7 @@ spec:
                             checkout scm
                         }
                     }
-                    state("Test Docker")
+                    stage("Test Docker")
                     {
                         sh "docker container ls"
                     }

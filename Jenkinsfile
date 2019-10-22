@@ -10,7 +10,7 @@ podTemplate(label: label,
                 containerTemplate(name: 'maven', image: 'maven:3.6.2-jdk-11-slim', ttyEnabled: true)
             ],
         volumes: [
-            hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+            hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'), 
             ],
         ) {
     node(label) {

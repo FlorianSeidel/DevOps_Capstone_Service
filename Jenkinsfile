@@ -22,13 +22,13 @@ podTemplate(label: label,
             }
 
             stage('Build') {
-                container('maven') {
+                //container('maven') {
                     echo "Building service..."
                     sh "echo 'Hello from Maven'"
                     sh "pwd"
                     sh "ls -ahl"
                     sh "./mvnw package"
-                }
+                //}
             }
         }
     }

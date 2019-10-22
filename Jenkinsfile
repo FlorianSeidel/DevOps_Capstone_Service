@@ -3,19 +3,20 @@ def home = "/home/jenkins"
 def workspace = "${home}/workspace/build-docker-jenkins"
 def workdir = "${workspace}/src/localhost/docker-jenkins/"
 
-/*podTemplate(label: label,
+podTemplate(label: label,
         containers: [
-                containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
+                containerTemplate(name: 'jnlp', image: 'florianseidel/capstone-build-slave:latest'),
                 containerTemplate(name: 'docker', image: 'docker', command: 'tail -f /dev/null', ttyEnabled: true),
                 containerTemplate(name: 'maven', image: 'maven:3.6.2-jdk-11-slim', command: 'tail -f /dev/null', ttyEnabled: true)
             ],
         volumes: [
             hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
             ],
-        )*/
-podTemplate(yaml: """
+        )
+/*podTemplate(yaml: """
 apiVersion: v1
 kind: Pod
+name: test-build-pod
 metadata:
   labels:
     some-label: ${label}
@@ -29,7 +30,7 @@ spec:
     - name: dind
       image: docker:18.05-dind
       securityContext:
-      privileged: true
+        privileged: true
       volumeMounts:
         - name: dind-storage
           mountPath: /var/lib/docker
@@ -37,7 +38,7 @@ spec:
     - name: dind-storage
       emptyDir: {}
 """
-) {
+)*/ {
     node(POD_LABEL) {
         dir(workdir) {
             stage('Checkout') {

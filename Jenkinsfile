@@ -7,7 +7,7 @@ podTemplate(label: label,
         containers: [
                 containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
                 containerTemplate(name: 'docker', image: 'docker', command: 'cat', ttyEnabled: true),
-                containerTemplate(name: 'maven', image: 'maven:3.6.2-jdk-11-slim', command: 'cat')
+                containerTemplate(name: 'maven', image: 'maven:3.6.2-jdk-11-slim')
             ],
         volumes: [
             hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),

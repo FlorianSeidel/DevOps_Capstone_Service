@@ -5,12 +5,16 @@ def workdir = "${workspace}/src/localhost/docker-jenkins/"
 
 podTemplate(
         containers: [
-                containerTemplate(name: 'jnlp', image: 'florianseidel/capstone-build-slave:latest'),
-                containerTemplate(name: 'docker', image: 'docker', command: 'tail -f /dev/null', ttyEnabled: true),
-                containerTemplate(name: 'maven', image: 'maven:3.6.2-jdk-11-slim', command: 'tail -f /dev/null', ttyEnabled: true)
+                containerTemplate(name: 'jnlp',
+                                  image: 'florianseidel/capstone-build-slave:latest',
+                                  envVars: [
+                                              envVar(key: 'DOCKER_HOST', value: 'tcp://localhost:2375'),
+                                          ]
+                                  ),
+                containerTemplate(name: 'dind', image: 'docker:18.05-dind')
             ],
-        volumes: [
-            hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
+            volumes: [
+                emptyDirVolume(mountPath: '/var/lib/docker', memory: false),
             ],
         )
 /*podTemplate(yaml: """

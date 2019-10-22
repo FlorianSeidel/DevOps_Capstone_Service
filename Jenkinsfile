@@ -1,3 +1,8 @@
+def label = "docker-jenkins-${UUID.randomUUID().toString()}"
+def home = "/home/jenkins"
+def workspace = "${home}/workspace/build-docker-jenkins"
+def workdir = "${workspace}/src/localhost/docker-jenkins/"
+
 podTemplate(label: label,
         containers: [
                 containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),

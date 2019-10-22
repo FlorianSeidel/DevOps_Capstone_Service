@@ -3,7 +3,7 @@ def home = "/home/jenkins"
 def workspace = "${home}/workspace/build-docker-jenkins"
 def workdir = "${workspace}/src/localhost/docker-jenkins/"
 
-podTemplate(label: label,
+/*podTemplate(label: label,
         containers: [
                 containerTemplate(name: 'jnlp', image: 'jenkins/jnlp-slave:alpine'),
                 containerTemplate(name: 'docker', image: 'docker', command: 'tail -f /dev/null', ttyEnabled: true),
@@ -12,7 +12,32 @@ podTemplate(label: label,
         volumes: [
             hostPathVolume(hostPath: '/var/run/docker.sock', mountPath: '/var/run/docker.sock'),
             ],
-        ) {
+        )*/
+podTemplate(yaml: """
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    some-label: ${label}
+spec:
+  containers:
+	  - name: jnlp
+	    image: florianseidel/capstone-build-slave:latest
+	    env:
+	        - name: DOCKER_HOST
+	          value: tcp://localhost:2375
+	  - name: dind
+	      image: docker:18.05-dind
+	      securityContext:
+	        privileged: true
+	      volumeMounts:
+	        - name: dind-storage
+	          mountPath: /var/lib/docker
+  volumes:
+		- name: dind-storage
+		  emptyDir: {}
+"""
+) {
     node(label) {
         dir(workdir) {
             stage('Checkout') {
@@ -20,15 +45,12 @@ podTemplate(label: label,
                     checkout scm
                 }
             }
-
-            container('maven') {
-                stage('Build') {
-                    echo "Building service..."
-                    sh "echo 'Hello from Maven'"
-                    sh "pwd"
-                    sh "ls -ahl"
-                    sh "./mvnw package"
-                }
+            stage('Build') {
+                echo "Building service..."
+                sh "echo 'Hello from Maven'"
+                sh "pwd"
+                sh "ls -ahl"
+                sh "./mvnw package"
             }
         }
     }

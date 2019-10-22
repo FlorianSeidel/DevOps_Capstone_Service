@@ -48,10 +48,7 @@ spec:
             }
             stage('Build') {
                 echo "Building service..."
-                sh "echo 'Hello from Maven'"
-                sh "pwd"
-                sh "ls -ahl"
-                sh "./mvnw package"
+                sh "chmod u+x mvnw &&./mvnw package"
             }
         }
     }

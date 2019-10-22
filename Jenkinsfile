@@ -38,7 +38,7 @@ spec:
       emptyDir: {}
 """
 ) {
-    node(label) {
+    node(POD_LABEL) {
         dir(workdir) {
             stage('Checkout') {
                 timeout(time: 3, unit: 'MINUTES') {

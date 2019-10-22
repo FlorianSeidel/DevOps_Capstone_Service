@@ -21,21 +21,21 @@ metadata:
     some-label: ${label}
 spec:
   containers:
-	  - name: jnlp
-	    image: florianseidel/capstone-build-slave:latest
-	    env:
-	        - name: DOCKER_HOST
-	          value: tcp://localhost:2375
-	  - name: dind
-	      image: docker:18.05-dind
-	      securityContext:
-	        privileged: true
-	      volumeMounts:
-	        - name: dind-storage
-	          mountPath: /var/lib/docker
+    - name: jnlp
+      image: florianseidel/capstone-build-slave:latest
+      env:
+          - name: DOCKER_HOST
+            value: tcp://localhost:2375
+    - name: dind
+        image: docker:18.05-dind
+        securityContext:
+          privileged: true
+        volumeMounts:
+          - name: dind-storage
+            mountPath: /var/lib/docker
   volumes:
-		- name: dind-storage
-		  emptyDir: {}
+    - name: dind-storage
+      emptyDir: {}
 """
 ) {
     node(label) {

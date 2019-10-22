@@ -3,7 +3,7 @@ def home = "/home/jenkins"
 def workspace = "${home}/workspace/build-docker-jenkins"
 def workdir = "${workspace}/src/localhost/docker-jenkins/"
 
-podTemplate(label: label,
+podTemplate(
         containers: [
                 containerTemplate(name: 'jnlp', image: 'florianseidel/capstone-build-slave:latest'),
                 containerTemplate(name: 'docker', image: 'docker', command: 'tail -f /dev/null', ttyEnabled: true),

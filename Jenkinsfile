@@ -43,6 +43,10 @@ spec:
                             checkout scm
                         }
                     }
+                    state("Test Docker")
+                    {
+                        sh "docker container ls"
+                    }
                     stage('Build') {
                         echo "Building service..."
                         sh "chmod u+x mvnw &&./mvnw package"

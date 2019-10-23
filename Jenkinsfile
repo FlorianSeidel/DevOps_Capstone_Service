@@ -43,10 +43,6 @@ spec:
                             checkout scm
                         }
                     }
-                    stage("Test Docker")
-                    {
-                        sh "docker container ls"
-                    }
                     stage('Build') {
                         echo "Building service..."
                         sh "chmod u+x mvnw && ./mvnw package"
@@ -56,7 +52,7 @@ spec:
                         echo "Building docker image..."
 
                         docker.withRegistry('', 'dockerhub') {
-                            def image = docker.build("capstone-service", "src/main/docker/Dockerfile.jvm")
+                            def image = docker.build("capstone-service", " -f src/main/docker/Dockerfile.jvm", ".")
                             image.push("${env.BUILD_ID}")
                             image.push("latest")
                         }

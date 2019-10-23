@@ -51,16 +51,30 @@ spec:
                         echo "Building service..."
                         sh "chmod u+x mvnw && ./mvnw package"
                     }
-                    stage('Build Docker')
+                    stage('Build Docker Image and Push')
                     {
                         echo "Building docker image..."
-                        sh "docker-compose build"
+
+                        docker.withRegistry('', 'dockerhub') {
+                            def image = docker.build("capstone-service", "src/main/docker/Dockerfile.jvm")
+                            image.push("${env.BUILD_ID}")
+                            image.push("latest")
+                        }
                     }
-                    stage('Push Docker')
+                    /*stage('Push Docker')
                     {
                         echo "Push docker image..."
+                        withCredentials([usernamePassword( credentialsId: 'docker-hub-credentials',
+                        usernameVariable: 'USERNAME',
+                        passwordVariable: 'PASSWORD')]) {
+
+                        docker.withRegistry('', 'docker-hub-credentials') {
+                        sh "docker login -u ${USERNAME} -p ${PASSWORD}"
+                        myImage.push("${env.BUILD_NUMBER}")
+                        myImage.push("latest")
+                        }
                         sh "docker-compose push"
-                    }
+                    }*/
                     stage('Lint Helm Chart')
                     {
                         echo "Linting Helm Chart"

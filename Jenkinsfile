@@ -52,9 +52,10 @@ spec:
                         echo "Building docker image..."
 
                         docker.withRegistry('', 'dockerhub') {
-                            def image = docker.build("capstone-service", " -f src/main/docker/Dockerfile.jvm", ".")
-                            image.push("${env.BUILD_ID}")
-                            image.push("latest")
+                            sh "docker-compose build"
+                            sh "docker tag florianseidel/capstone-service:latest florianseidel/capstone-service:${env.BUILD_ID}"
+                            sh "docker push florianseidel/capstone-service:latest"
+                            sh "docker push florianseidel/capstone-service:${env.BUILD_ID}"
                         }
                     }
                     /*stage('Push Docker')

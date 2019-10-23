@@ -1,9 +1,7 @@
 version: '2'
 services:
   jenkins:
-    image: florianseidel/capstone-build-slave:latest
+    image: florianseidel/capstone-service:latest
     build:
       context: .
-      dockerfile: Dockerfile
-    environment:
-      DOCKER_HOST: "tcp://localhost:2375"
+      dockerfile: src/main/docker/Dockerfile.jvm

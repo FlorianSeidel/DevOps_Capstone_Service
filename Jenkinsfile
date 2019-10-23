@@ -49,7 +49,27 @@ spec:
                     }
                     stage('Build') {
                         echo "Building service..."
-                        sh "chmod u+x mvnw &&./mvnw package"
+                        sh "chmod u+x mvnw && ./mvnw package"
+                    }
+                    stage('Build Docker')
+                    {
+                        echo "Building docker image..."
+                        sh "docker-compose build"
+                    }
+                    stage('Push Docker')
+                    {
+                        echo "Push docker image..."
+                        sh "docker-compose push"
+                    }
+                    stage('Lint Helm Chart')
+                    {
+                        echo "Linting Helm Chart"
+                        sh "helm lint src/helm/capstone-service"
+                        sh "helm template src/helm/capstone-service"
+                    }
+                    stage('Publish Helm Chart')
+                    {
+                        echo "Publish Helm Chart"
                     }
                 }
             }

@@ -58,20 +58,6 @@ spec:
                             sh "docker push florianseidel/capstone-service:${env.BUILD_ID}"
                         }
                     }
-                    /*stage('Push Docker')
-                    {
-                        echo "Push docker image..."
-                        withCredentials([usernamePassword( credentialsId: 'docker-hub-credentials',
-                        usernameVariable: 'USERNAME',
-                        passwordVariable: 'PASSWORD')]) {
-
-                        docker.withRegistry('', 'docker-hub-credentials') {
-                        sh "docker login -u ${USERNAME} -p ${PASSWORD}"
-                        myImage.push("${env.BUILD_NUMBER}")
-                        myImage.push("latest")
-                        }
-                        sh "docker-compose push"
-                    }*/
                     stage('Lint Helm Chart')
                     {
                         echo "Linting Helm Chart"

@@ -44,6 +44,55 @@ spec:
                             checkout scm
                         }
                     }
+                    state("Check pre-conditions")
+                    {
+                        def pom = readMavenPom file: pom.xml
+                        if(!(env.BRANCH_NAME.startsWith("release-")
+                             || env.BRANCH_NAME == "master"
+                             || env.BRANCH_NAME.startsWith("feature-")
+                        {
+                            error("Only release-*, feature-* and master branches allowed.")
+                        }
+                        else if (env.BRANCH_NAME.startsWith("release-"))
+                        {
+                            if (pom.version.endsWith("-SNAPSHOT"))
+                            {
+								error("SNAPSHOT versions not allowed on release branches.")
+                            }
+                        }
+                    }
+                    stage("Lint docker files")
+                    {
+						sh "docker run --rm -i hadolint/hadolint < src/main/docker/Dockerfile.jvm"
+						sh "docker run --rm -i hadolint/hadolint < src/main/docker/Dockerfile.native"
+                    }
+                    if(env.BRANCH_NAME.startsWith("release-"))
+                    {
+                        stage('Modify Helm Chart for release')
+                        {
+                            def pom = readMavenPom file: 'pom.xml'
+                            def valuesFile = 'src/helm/capstone-service/values.yaml'
+                            def valuesData = readYaml file: valuesFile
+                            valuesData.image.tag = pom.version
+                            sh "rm ${valuesFile}"
+                            writeYaml file: valuesFile, data: valuesData
+                            sh "cat ${valuesFile}"
+
+                            def chartFile = 'src/helm/capstone-service/Chart.yaml'
+                            def chartData = readYaml file: chartFile
+                            chartData.version = pom.version
+                            chartData.appVersion = pom.version
+                            sh "rm ${chartFile}"
+                            writeYaml file: chartFile, data: chartData
+                            sh "cat ${chartFile}"
+                        }
+                    }
+                    stage('Lint Helm Chart')
+                    {
+                        echo "Linting Helm Chart"
+                        sh "helm lint src/helm/capstone-service"
+                        sh "helm template src/helm/capstone-service"
+                    }
                     stage('Build') {
                         echo "Building service..."
                         sh "chmod +x mvnw && ./mvnw package"
@@ -58,11 +107,16 @@ spec:
 							{
 	                            sh "docker push florianseidel/capstone-service:latest"
 		                    }
+		                    else if(env.BRANCH_NAME.startsWith("feature-"))
+		                    {
+		                        sh "docker tag florianseidel/capstone-service:latest florianseidel/capstone-service:${env.BRANCH_NAME}"
+                                sh "docker push florianseidel/capstone-service:${env.BRANCH_NAME}"
+		                    }
 		                    else if(env.BRANCH_NAME.startsWith("release-"))
 		                    {
 		                        //check if image tag exists remotely
-			                    pom = readMavenPom file: 'pom.xml'
-		                        exists = sh(returnStatus:true, script: "curl --silent -f -lSL https://index.docker.io/v1/repositories/florianseidel/capstone-service/tags/${pom.version} > /dev/null")
+			                    def pom = readMavenPom file: 'pom.xml'
+		                        def exists = sh(returnStatus:true, script: "curl --silent -f -lSL https://index.docker.io/v1/repositories/florianseidel/capstone-service/tags/${pom.version} > /dev/null")
 		                        if (!exists)
 		                        {
 			                        sh "docker tag florianseidel/capstone-service:latest florianseidel/capstone-service:${pom.version}"
@@ -74,16 +128,10 @@ spec:
 			                    }
 			                    else
 			                    {
-			                        echo "WARNING: Image will not be built and pushed, because an image with the same tag ${pom.version} already exists in the registry."
+			                        error("Image will not be built and pushed, because an image with the same tag ${pom.version} already exists in the registry.")
 			                    }
 		                    }
 	                    }
-                    }
-                    stage('Lint Helm Chart')
-                    {
-                        echo "Linting Helm Chart"
-                        sh "helm lint src/helm/capstone-service"
-                        sh "helm template src/helm/capstone-service"
                     }
                     if(env.BRANCH_NAME.startsWith("release-"))
                     {
@@ -92,28 +140,24 @@ spec:
 	                        echo "Publish Helm Chart"
 	                        sh "mkdir .deploy"
 	                        sh "helm package src/helm/capstone-service --destination .deploy"
-	                        crResult = sh(returnStdout:true, script:"cr upload -o FlorianSeidel -r ${helmRepo} -p .deploy")
-	                        if (crResult.contains("Release Field:tag_name Code:already_exists"))
-	                        {
-	                            echo "WARNING: Helm package with this version already uploaded to repository."
-	                        }
-	                        else
-	                        {
-	                            //Tag helm chart release
-	                            versionLine = sh(returnStdout:true, script: "helm inspect ./src/helm/capstone-service | grep ^version:")
-	                            helmVersion = versionLine.split()[1]
-	                            withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-		                            sh 'git tag -a chart-v${helmVersion} -m "Published Helm Chart version ${helmVersion}"'
-		                            sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/FlorianSeidel/DevOps_Capstone_Service.git --tags"
+	                        // This will fail the build if a chart with the same tag already exists in the repo.
+	                        sh "cr upload -o FlorianSeidel -r ${helmRepo} -p .deploy"
 
-	                                sh "git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/FlorianSeidel/${helmRepo}.git repo"
-									dir("repo")
-									{
-			                            sh "cr index -i ./index.yaml -o FlorianSeidel -c https://github.com/FlorianSeidel/DevOps_Capstone_Service.git -r ${helmRepo} -p ../.deploy"
-										sh "git commit -m \"Deploy version ${helmVersion} of capstone-service Helm Chart.\""
-										sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/FlorianSeidel/${helmRepo}.git"
-									}
+                            //Tag helm chart release
+                            def versionLine = sh(returnStdout:true, script: "helm inspect ./src/helm/capstone-service | grep ^version:")
+                            def helmVersion = versionLine.split()[1]
+                            withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+
+                                sh "git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/FlorianSeidel/${helmRepo}.git repo"
+								dir("repo")
+								{
+		                            sh "cr index -i ./index.yaml -o FlorianSeidel -c https://github.com/FlorianSeidel/DevOps_Capstone_Service.git -r ${helmRepo} -p ../.deploy"
+									sh "git commit -m \"Deploy version ${helmVersion} of capstone-service Helm Chart.\""
+									sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/FlorianSeidel/${helmRepo}.git"
 								}
+								//After index was updated successfully, tag the branch and push the image.
+								sh 'git tag -a chart-v${helmVersion} -m "Published Helm Chart version ${helmVersion}"'
+                                sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/FlorianSeidel/DevOps_Capstone_Service.git --tags"
 							}
 	                    }
 	                }

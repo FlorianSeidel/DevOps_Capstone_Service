@@ -116,18 +116,19 @@ spec:
                         docker.withRegistry('', 'dockerhub') {
 
 	                        sh "docker-compose build"
+	                        def shortCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
 							if(env.BRANCH_NAME == "master")
 							{
 	                            sh "docker push florianseidel/capstone-service:latest"
 	                            shortCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
 	                            sh "docker tag florianseidel/capstone-service:latest florianseidel/capstone-service:dev-${shortCommit}"
-								sh "docker push florianseidel/capstone-service:dev-${shortCommit}"
+								sh "docker push florianseidel/capstone-service:master-${shortCommit}"
 		                    }
 		                    else if(env.BRANCH_NAME.startsWith("feature/"))
 		                    {
 		                        def featureTag = env.BRANCH_NAME.split("/")[1]
 		                        sh "docker tag florianseidel/capstone-service:latest florianseidel/capstone-service:${featureTag}"
-                                sh "docker push florianseidel/capstone-service:${featureTag}"
+                                sh "docker push florianseidel/capstone-service:${featureTag}-${shortCommit}"
 		                    }
 		                    else if(env.BRANCH_NAME.startsWith("release/"))
 		                    {

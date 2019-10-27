@@ -128,7 +128,7 @@ spec:
 		                    {
 		                        def featureTag = env.BRANCH_NAME.split("/")[1]
 		                        sh "docker tag florianseidel/capstone-service:latest florianseidel/capstone-service:${featureTag}"
-                                sh "docker push florianseidel/capstone-service:${featureTag}-${shortCommit}"
+                                sh "docker push florianseidel/capstone-service:feature-${featureTag}-${shortCommit}"
 		                    }
 		                    else if(env.BRANCH_NAME.startsWith("release/"))
 		                    {

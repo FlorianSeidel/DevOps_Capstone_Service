@@ -44,7 +44,7 @@ spec:
                             checkout scm
                         }
                     }
-                    state("Check pre-conditions")
+                    stage("Check pre-conditions")
                     {
                         def pom = readMavenPom file: pom.xml
                         if(!(env.BRANCH_NAME.startsWith("release/")

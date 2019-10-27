@@ -46,7 +46,7 @@ spec:
                     }
                     stage("Check pre-conditions")
                     {
-                        def pom = readMavenPom file: pom.xml
+                        pom = readMavenPom file: pom.xml
                         if(!(env.BRANCH_NAME.startsWith("release/")
                              || env.BRANCH_NAME == "master"
                              || env.BRANCH_NAME.startsWith("feature/")))

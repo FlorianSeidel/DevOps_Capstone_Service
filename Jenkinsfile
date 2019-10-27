@@ -154,6 +154,7 @@ spec:
 								dir("repo")
 								{
 		                            sh "cr index -i ./index.yaml -o FlorianSeidel -c https://github.com/FlorianSeidel/DevOps_Capstone_Service.git -r ${helmRepo} -p ../.deploy"
+									sh "git add index.yaml"
 									sh "git commit -m \"Deploy version ${helmVersion} of capstone-service Helm Chart.\""
 									sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/FlorianSeidel/${helmRepo}.git"
 								}

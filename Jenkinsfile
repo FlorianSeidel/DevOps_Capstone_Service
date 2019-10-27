@@ -47,13 +47,13 @@ spec:
                     state("Check pre-conditions")
                     {
                         def pom = readMavenPom file: pom.xml
-                        if(!(env.BRANCH_NAME.startsWith("release-")
+                        if(!(env.BRANCH_NAME.startsWith("release/")
                              || env.BRANCH_NAME == "master"
-                             || env.BRANCH_NAME.startsWith("feature-")))
+                             || env.BRANCH_NAME.startsWith("feature/")))
                         {
-                            error("Only release-*, feature-* and master branches allowed.")
+                            error("Only release/*, feature/* and master branches allowed.")
                         }
-                        else if (env.BRANCH_NAME.startsWith("release-"))
+                        else if (env.BRANCH_NAME.startsWith("release/"))
                         {
                             if (pom.version.endsWith("-SNAPSHOT"))
                             {
@@ -66,7 +66,7 @@ spec:
 						sh "docker run --rm -i hadolint/hadolint < src/main/docker/Dockerfile.jvm"
 						sh "docker run --rm -i hadolint/hadolint < src/main/docker/Dockerfile.native"
                     }
-                    if(env.BRANCH_NAME.startsWith("release-"))
+                    if(env.BRANCH_NAME.startsWith("release/"))
                     {
                         stage('Modify Helm Chart for release')
                         {
@@ -107,12 +107,13 @@ spec:
 							{
 	                            sh "docker push florianseidel/capstone-service:latest"
 		                    }
-		                    else if(env.BRANCH_NAME.startsWith("feature-"))
+		                    else if(env.BRANCH_NAME.startsWith("feature/"))
 		                    {
-		                        sh "docker tag florianseidel/capstone-service:latest florianseidel/capstone-service:${env.BRANCH_NAME}"
-                                sh "docker push florianseidel/capstone-service:${env.BRANCH_NAME}"
+		                        def featureTag = env.BRANCH_NAME.split("/")[1]
+		                        sh "docker tag florianseidel/capstone-service:latest florianseidel/capstone-service:${featureTag}"
+                                sh "docker push florianseidel/capstone-service:${featureTag}"
 		                    }
-		                    else if(env.BRANCH_NAME.startsWith("release-"))
+		                    else if(env.BRANCH_NAME.startsWith("release/"))
 		                    {
 		                        //check if image tag exists remotely
 			                    def pom = readMavenPom file: 'pom.xml'
@@ -133,7 +134,7 @@ spec:
 		                    }
 	                    }
                     }
-                    if(env.BRANCH_NAME.startsWith("release-"))
+                    if(env.BRANCH_NAME.startsWith("release/"))
                     {
 	                    stage('Publish Helm Chart')
 	                    {

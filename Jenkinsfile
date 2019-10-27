@@ -60,6 +60,11 @@ spec:
 								error("SNAPSHOT versions not allowed on release branches.")
                             }
                         }
+                        def retCode = sh(returnStatus:true, script: "curl --silent -f -lSL https://index.docker.io/v1/repositories/florianseidel/capstone-service/tags/${pom.version}")
+                        if (retCode == 0)
+                        {
+                            error("Image will not be built and pushed, because an image with the same tag ${pom.version} already exists in the registry.")
+                        }
                     }
                     stage("Lint docker files")
                     {

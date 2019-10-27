@@ -119,7 +119,7 @@ spec:
 			                    def pom = readMavenPom file: 'pom.xml'
 			                    echo "Checking if docker image exists"
 
-		                        def output = sh(returnStatus:true, script: "curl --silent -f -lSL https://index.docker.io/v1/repositories/florianseidel/capstone-service/tags/${pom.version}")
+		                        def output = sh(returnStdout:true, script: "curl --silent -f -lSL https://index.docker.io/v1/repositories/florianseidel/capstone-service/tags/${pom.version}")
 		                        echo output
 		                        def exists = output.contains("Tag not found") || output.contains("404 NOT FOUND")
 		                        if (!exists)

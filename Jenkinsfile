@@ -117,12 +117,8 @@ spec:
 		                    {
 		                        //check if image tag exists remotely
 			                    def pom = readMavenPom file: 'pom.xml'
-			                    echo "Checking if docker image exists"
-
-		                        def output = sh(returnStdout:true, script: "curl --silent -f -lSL https://index.docker.io/v1/repositories/florianseidel/capstone-service/tags/${pom.version}")
-		                        echo output
-		                        def exists = output.contains("Tag not found") || output.contains("404 NOT FOUND")
-		                        if (!exists)
+		                        def retCode = sh(returnStatus:true, script: "curl --silent -f -lSL https://index.docker.io/v1/repositories/florianseidel/capstone-service/tags/${pom.version}")
+		                        if (retCode == 0)
 		                        {
 			                        sh "docker tag florianseidel/capstone-service:latest florianseidel/capstone-service:${pom.version}"
 			                        sh "docker push florianseidel/capstone-service:${pom.version}"

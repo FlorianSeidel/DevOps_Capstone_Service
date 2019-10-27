@@ -123,7 +123,7 @@ spec:
 			                        sh "docker tag florianseidel/capstone-service:latest florianseidel/capstone-service:${pom.version}"
 			                        sh "docker push florianseidel/capstone-service:${pom.version}"
 			                        withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-				                        sh 'git tag -a service-v${pom.version} -m "Published service version ${pom.version}"'
+				                        sh "git tag -a service-v${pom.version} -m \"Published service version ${pom.version}\""
 	                                    sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/FlorianSeidel/DevOps_Capstone_Service.git --tags"
                                     }
 			                    }
@@ -157,7 +157,7 @@ spec:
 									sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/FlorianSeidel/${helmRepo}.git"
 								}
 								//After index was updated successfully, tag the branch and push the image.
-								sh 'git tag -a chart-v${helmVersion} -m "Published Helm Chart version ${helmVersion}"'
+								sh "git tag -a chart-v${helmVersion} -m \"Published Helm Chart version ${helmVersion}\""
                                 sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/FlorianSeidel/DevOps_Capstone_Service.git --tags"
 							}
 	                    }

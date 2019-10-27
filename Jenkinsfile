@@ -119,6 +119,9 @@ spec:
 							if(env.BRANCH_NAME == "master")
 							{
 	                            sh "docker push florianseidel/capstone-service:latest"
+	                            shortCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
+	                            sh "docker tag florianseidel/capstone-service:latest florianseidel/capstone-service:dev-${shortCommit}"
+								sh "docker push florianseidel/capstone-service:dev-${shortCommit}"
 		                    }
 		                    else if(env.BRANCH_NAME.startsWith("feature/"))
 		                    {

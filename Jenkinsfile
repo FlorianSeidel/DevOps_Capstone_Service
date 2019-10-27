@@ -81,7 +81,7 @@ spec:
                         stage('Modify Helm Chart for release')
                         {
                             def pom = readMavenPom file: 'pom.xml'
-                            def splitVersion = pom.version.split(".")
+                            def splitVersion = pom.version.tokenize(".")
                             def majorMinor = "${splitVersion[0]}.${splitVersion[1]}"
 
                             def valuesFile = 'src/helm/capstone-service/values.yaml'

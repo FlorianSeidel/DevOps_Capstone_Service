@@ -64,7 +64,7 @@ spec:
                     stage("Lint docker files")
                     {
 						sh "docker run --rm -i hadolint/hadolint < src/main/docker/Dockerfile.jvm"
-						sh "docker run --rm -i hadolint/hadolint < src/main/docker/Dockerfile.native"
+						//sh "docker run --rm -i hadolint/hadolint < src/main/docker/Dockerfile.native"
                     }
                     if(env.BRANCH_NAME.startsWith("release/"))
                     {

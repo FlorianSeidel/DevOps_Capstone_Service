@@ -5,3 +5,5 @@ services:
     build:
       context: .
       dockerfile: src/main/docker/Dockerfile.jvm
+    ports:
+      - "8888:8080"

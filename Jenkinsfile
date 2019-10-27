@@ -46,7 +46,7 @@ spec:
                     }
                     stage("Check pre-conditions")
                     {
-                        pom = readMavenPom file: pom.xml
+                        def pom = readMavenPom file: pom.xml
                         if(!(env.BRANCH_NAME.startsWith("release/")
                              || env.BRANCH_NAME == "master"
                              || env.BRANCH_NAME.startsWith("feature/")))
@@ -55,7 +55,7 @@ spec:
                         }
                         else if (env.BRANCH_NAME.startsWith("release/"))
                         {
-                            if (pom.version.endsWith("-SNAPSHOT"))
+                            if (readMavenPom(file:pom.xml).version.endsWith("-SNAPSHOT"))
                             {
 								error("SNAPSHOT versions not allowed on release branches.")
                             }

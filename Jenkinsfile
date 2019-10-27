@@ -49,7 +49,7 @@ spec:
                         def pom = readMavenPom file: pom.xml
                         if(!(env.BRANCH_NAME.startsWith("release-")
                              || env.BRANCH_NAME == "master"
-                             || env.BRANCH_NAME.startsWith("feature-")
+                             || env.BRANCH_NAME.startsWith("feature-"))
                         {
                             error("Only release-*, feature-* and master branches allowed.")
                         }

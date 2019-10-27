@@ -28,6 +28,9 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
+          env:
+            - name: QUARKUS_PROFILE
+              value: "{{ .Values.quarkus.profile }}"
           livenessProbe:
             httpGet:
               path: /health/live

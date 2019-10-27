@@ -81,6 +81,9 @@ spec:
                         stage('Modify Helm Chart for release')
                         {
                             def pom = readMavenPom file: 'pom.xml'
+                            def splitVersion = pom.version.split(".")
+                            def majorMinor = "${splitVersion[0]}.${splitVersion[1]}"
+
                             def valuesFile = 'src/helm/capstone-service/values.yaml'
                             def valuesData = readYaml file: valuesFile
                             valuesData.image.tag = pom.version
@@ -90,8 +93,8 @@ spec:
 
                             def chartFile = 'src/helm/capstone-service/Chart.yaml'
                             def chartData = readYaml file: chartFile
-                            chartData.version = pom.version
-                            chartData.appVersion = pom.version
+                            chartData.version = majorMinor
+                            chartData.appVersion = majorMinor
                             sh "rm ${chartFile}"
                             writeYaml file: chartFile, data: chartData
                             sh "cat ${chartFile}"
@@ -153,25 +156,33 @@ spec:
                             sh "helm package src/helm/capstone-service --destination .deploy"
 	                        withCredentials([string(credentialsId: 'github-token', variable: 'crToken')]) {
 		                        // This will fail the build if a chart with the same tag already exists in the repo.
-		                        sh "cr upload -o FlorianSeidel -r ${helmRepo} -p .deploy -t ${crToken}"
-							}
-                            //Tag helm chart release
-                            def versionLine = sh(returnStdout:true, script: "helm inspect ./src/helm/capstone-service | grep ^version:")
-                            def helmVersion = versionLine.split()[1]
-                            withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
+		                        def retCode = sh(returnStatus:true, script:  "cr upload -o FlorianSeidel -r ${helmRepo} -p .deploy -t ${crToken}")
+		                        if(retCode!=0)
+		                        {
+		                            echo "WARNING: Helm chart will not be released to repo, because a chart with the same version already exists."
+		                        }
+		                        else
+		                        {
+		                            //Tag helm chart release
+                                    def versionLine = sh(returnStdout:true, script: "helm inspect ./src/helm/capstone-service | grep ^version:")
+                                    def helmVersion = versionLine.split()[1]
+                                    withCredentials([usernamePassword(credentialsId: 'github', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
 
-                                sh "git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/FlorianSeidel/${helmRepo}.git repo"
-								dir("repo")
-								{
-		                            sh "cr index -i ./index.yaml -o FlorianSeidel -c https://github.com/FlorianSeidel/DevOps_Capstone_Service.git -r ${helmRepo} -p ../.deploy"
-									sh "git add index.yaml"
-									sh "git commit -m \"Deploy version ${helmVersion} of capstone-service Helm Chart.\""
-									sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/FlorianSeidel/${helmRepo}.git"
-								}
-								//After index was updated successfully, tag the branch and push the image.
-								sh "git tag -a chart-v${helmVersion} -m \"Published Helm Chart version ${helmVersion}\""
-                                sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/FlorianSeidel/DevOps_Capstone_Service.git --tags"
+                                        sh "git clone https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/FlorianSeidel/${helmRepo}.git repo"
+                                        dir("repo")
+                                        {
+                                            sh "cr index -i ./index.yaml -o FlorianSeidel -c https://github.com/FlorianSeidel/DevOps_Capstone_Service.git -r ${helmRepo} -p ../.deploy"
+                                            sh "git add index.yaml"
+                                            sh "git commit -m \"Deploy version ${helmVersion} of capstone-service Helm Chart.\""
+                                            sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/FlorianSeidel/${helmRepo}.git"
+                                        }
+                                        //After index was updated successfully, tag the branch and push the image.
+                                        sh "git tag -a chart-v${helmVersion} -m \"Published Helm Chart version ${helmVersion}\""
+                                        sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/FlorianSeidel/DevOps_Capstone_Service.git --tags"
+                                    }
+		                        }
 							}
+
 	                    }
 	                }
                 }

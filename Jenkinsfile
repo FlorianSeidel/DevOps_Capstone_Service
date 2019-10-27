@@ -138,12 +138,13 @@ spec:
                     {
 	                    stage('Publish Helm Chart')
 	                    {
-	                        echo "Publish Helm Chart"
-	                        sh "mkdir .deploy"
-	                        sh "helm package src/helm/capstone-service --destination .deploy"
-	                        // This will fail the build if a chart with the same tag already exists in the repo.
-	                        sh "cr upload -o FlorianSeidel -r ${helmRepo} -p .deploy"
-
+	                    	echo "Publish Helm Chart"
+                            sh "mkdir .deploy"
+                            sh "helm package src/helm/capstone-service --destination .deploy"
+	                        withCredentials([string(credentialsId: 'github-token', variable: 'crToken')]) {
+		                        // This will fail the build if a chart with the same tag already exists in the repo.
+		                        sh "cr upload -o FlorianSeidel -r ${helmRepo} -p .deploy -t ${crToken}"
+							}
                             //Tag helm chart release
                             def versionLine = sh(returnStdout:true, script: "helm inspect ./src/helm/capstone-service | grep ^version:")
                             def helmVersion = versionLine.split()[1]

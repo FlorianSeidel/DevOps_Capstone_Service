@@ -7,10 +7,8 @@ quarkus:
 
 replicaCount: 1
 
-image:
-  repository: florianseidel/capstone-service
-  tag: latest
-  pullPolicy: Always
+image: florianseidel/capstone-service:latest
+imagePullPolicy: Always
 
 imagePullSecrets:
   - name: regcred

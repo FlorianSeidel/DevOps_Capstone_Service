@@ -86,7 +86,7 @@ spec:
 
                             def valuesFile = 'src/helm/capstone-service/values.yaml'
                             def valuesData = readYaml file: valuesFile
-                            valuesData.image.tag = pom.version
+                            valuesData.image = "florianseidel/capstone-service:${pom.version}"
                             sh "rm ${valuesFile}"
                             writeYaml file: valuesFile, data: valuesData
                             sh "cat ${valuesFile}"

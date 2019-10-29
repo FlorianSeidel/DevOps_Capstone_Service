@@ -13,4 +13,5 @@ public class GrettingResource {
     public String hello() {
         return "hello";
     }
+
 }

@@ -6,6 +6,8 @@ quarkus:
   profile: dev
 
 replicaCount: 1
+minReplicas: 1
+maxReplicas: 10
 
 image: florianseidel/capstone-service:latest
 imagePullPolicy: Always

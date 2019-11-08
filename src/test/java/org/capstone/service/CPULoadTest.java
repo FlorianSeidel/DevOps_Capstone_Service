@@ -10,7 +10,7 @@ import static org.hamcrest.CoreMatchers.is;
 public class CPULoadTest {
 
     @Test
-    public void testHelloEndpoint() {
+    public void testCreateLoadEndpoint() {
             given()
                     .when().get("/create-load")
                     .then()

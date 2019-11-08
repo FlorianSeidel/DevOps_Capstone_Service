@@ -195,9 +195,10 @@ spec:
 		                    // Flux will update image version to latest
 		                    shortCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
 		                    def updateOk = false
-		                    for(i=0;i<10;i++)
+		                    for(i=0;i<12;i++)
 		                    {
-		                        def image_version = sh(returnStatus:true, script:  "kubectl get pod -l app.kubernetes.io/instance=capstone-service-dev  -n capstone-dev -o jsonpath=\"{..image}\" | tr -s '[[:space:]]' '\n' |sort |uniq")
+		                        def image_version = sh(returnStdout: true,, script:  "kubectl get pod -l app.kubernetes.io/instance=capstone-service-dev  -n capstone-dev -o jsonpath=\"{..image}\" | tr -s '[[:space:]]' '\n' |sort |uniq")
+		                        echo image_version
 		                        if (image_version.split(":")[1] == "master-${shortCommit}")
 		                        {
 		                            updateOk = true

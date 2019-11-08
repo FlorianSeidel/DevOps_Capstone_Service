@@ -105,17 +105,14 @@ spec:
                     }
                     stage('Lint Helm Chart')
                     {
-                        echo "Linting Helm Chart"
                         sh "helm lint src/helm/capstone-service"
                         sh "helm template src/helm/capstone-service"
                     }
                     stage('Build') {
-                        echo "Building service..."
                         sh "chmod +x mvnw && ./mvnw package"
                     }
                     stage('Build Docker Image and Push')
                     {
-                        echo "Building docker image..."
                         docker.withRegistry('', 'dockerhub') {
 
 	                        sh "docker-compose build"
@@ -158,7 +155,6 @@ spec:
                     {
 	                    stage('Publish Helm Chart')
 	                    {
-	                    	echo "Publish Helm Chart"
                             sh "mkdir .deploy"
                             sh "helm package src/helm/capstone-service --destination .deploy"
 	                        withCredentials([string(credentialsId: 'github-token', variable: 'crToken')]) {
@@ -191,6 +187,36 @@ spec:
 							}
 
 	                    }
+	                }
+	                if(env.BRANCH_NAME == "master")
+	                {
+	                    stage("Acceptance tests")
+	                    {
+		                    // Flux will update image version to latest
+		                    shortCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
+		                    def updateOk = false
+		                    for(i=0;i<10;i++)
+		                    {
+		                        def image_version = sh(returnStatus:true, script:  "kubectl get pod -l app.kubernetes.io/instance=capstone-service-dev  -n capstone-dev -o jsonpath=\"{..image}\" | tr -s '[[:space:]]' '\n' |sort |uniq")
+		                        if (image_version.split(":")[1] == "master-${shortCommit}")
+		                        {
+		                            updateOk = true
+		                            break;
+		                        }
+		                        sleep 10
+		                    }
+		                    if(!updateOk)
+		                    {
+		                        error("Image update of service deployment in namespace capstone-dev failed")
+		                    }
+		                    else
+		                    {
+		                        //Wait for ready status
+		                        sh "kubectl wait --for condition=ready pod -l app.kubernetes.io/instance=capstone-service-dev --timeout=120s -n capstone-service-dev"
+		                        //Run tests
+		                        echo "Running tests..."
+		                    }
+		                }
 	                }
                 }
             }

@@ -11,12 +11,10 @@ public class CPULoadTest {
 
     @Test
     public void testHelloEndpoint() {
-        for(int i=0;i<100000;i++) {
             given()
                     .when().get("/create-load")
                     .then()
                     .statusCode(200);
-        }
     }
 
 }

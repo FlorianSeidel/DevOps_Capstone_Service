@@ -1,0 +1,22 @@
+package org.capstone.service;
+
+import io.quarkus.test.junit.QuarkusTest;
+import org.junit.jupiter.api.Test;
+
+import static io.restassured.RestAssured.given;
+import static org.hamcrest.CoreMatchers.is;
+
+@QuarkusTest
+public class CPULoadTest {
+
+    @Test
+    public void testHelloEndpoint() {
+        for(int i=0;i<100000;i++) {
+            given()
+                    .when().get("/create-load")
+                    .then()
+                    .statusCode(200);
+        }
+    }
+
+}

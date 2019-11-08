@@ -12,7 +12,8 @@ podTemplate(
                                               envVar(key: 'DOCKER_HOST', value: 'tcp://localhost:2375')
                                           ]
                                   )
-            ]
+            ],
+        nodeSelector: 'role: builder'
 )
 {
         podTemplate(yaml: """
@@ -23,6 +24,8 @@ metadata:
   labels:
     some-label: ${label}
 spec:
+  nodeSelector:
+    role: builder
   containers:
     - name: dind
       image: docker:18.05-dind

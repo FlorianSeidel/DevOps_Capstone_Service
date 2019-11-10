@@ -197,6 +197,10 @@ spec:
 	                {
 	                    stage("Acceptance tests")
 	                    {
+	                        sh "ls -ahl /home/jenkins/.kube/config"
+	                        sh "ls -ahl /home/jenkins/.aws/credentials"
+	                        sh "ls -ahl /home/jenkins/.aws"
+	                        sh "ls -ahl /home/jenkins/.aws/config"
 		                    // Flux will update image version to latest
 		                    shortCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
 		                    def updateOk = false

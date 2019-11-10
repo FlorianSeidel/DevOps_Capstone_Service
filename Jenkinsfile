@@ -198,8 +198,9 @@ spec:
 		                    def updateOk = false
 		                    for(i=0;i<12;i++)
 		                    {
-		                        def image_version = sh(returnStdout: true,, script:  "kubectl get pod -l app.kubernetes.io/instance=capstone-service-dev  -n capstone-dev -o jsonpath=\"{..image}\" | tr -s '[[:space:]]' '\n' |sort |uniq")
+		                        def image_version = sh(returnStdout: true, script:  "kubectl get pod -l app.kubernetes.io/instance=capstone-service-dev  -n capstone-dev -o jsonpath=\"{..image}\" | tr -s '[[:space:]]' '\n' |sort |uniq")
 		                        echo "Waiting for tag master-${shortCommit} to be deployed."
+		                        echo "Current image version: ${image_version}"
 		                        if (image_version.endsWith("master-${shortCommit}"))
 		                        {
 		                            updateOk = true
@@ -213,6 +214,7 @@ spec:
 		                    }
 		                    else
 		                    {
+		                        echo "Waiting for ready state..."
 		                        //Wait for ready status
 		                        sh "kubectl wait --for condition=ready pod -l app.kubernetes.io/instance=capstone-service-dev --timeout=120s -n capstone-dev"
 		                        //Run tests

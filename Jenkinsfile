@@ -201,7 +201,7 @@ spec:
 		                        def image_version = sh(returnStdout: true, script:  "kubectl get pod -l app.kubernetes.io/instance=capstone-service-dev  -n capstone-dev -o jsonpath=\"{..image}\" | tr -s '[[:space:]]' '\n' |sort |uniq")
 		                        echo "Waiting for tag master-${shortCommit} to be deployed."
 		                        echo "Current image version: ${image_version}"
-		                        def endsWith = image_version.endsWith("master-${shortCommit}")
+		                        def endsWith = image_version.contains("master-${shortCommit}")
 		                        echo "EndsWith: ${endsWith}"
 		                        if (endsWith)
 		                        {

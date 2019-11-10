@@ -214,7 +214,7 @@ spec:
 		                    else
 		                    {
 		                        //Wait for ready status
-		                        sh "kubectl wait --for condition=ready pod -l app.kubernetes.io/instance=capstone-service-dev --timeout=120s -n capstone-service-dev"
+		                        sh "kubectl wait --for condition=ready pod -l app.kubernetes.io/instance=capstone-service-dev --timeout=120s -n capstone-dev"
 		                        //Run tests
 		                        echo "Running tests..."
 		                    }

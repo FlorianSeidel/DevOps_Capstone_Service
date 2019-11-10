@@ -15,7 +15,7 @@ podTemplate(
             ],
         nodeSelector: 'role: builder',
         volumes: [
-                secretVolume(mountPath: '/home/jenkins/.aws/credentials', secretName: 'aws-credentials-secret'),
+                secretVolume(mountPath: '/home/jenkins/.aws/credentials', secretName: 'aws-credentials'),
                 configMapVolume(mountPath: '/home/jenkins/.aws/config', configMapName: 'aws-config'),
                 configMapVolume(mountPath: '/home/jenkins/.kube/config', configMapName: 'kube-config')
             ]

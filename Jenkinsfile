@@ -199,8 +199,8 @@ spec:
 		                    for(i=0;i<12;i++)
 		                    {
 		                        def image_version = sh(returnStdout: true,, script:  "kubectl get pod -l app.kubernetes.io/instance=capstone-service-dev  -n capstone-dev -o jsonpath=\"{..image}\" | tr -s '[[:space:]]' '\n' |sort |uniq")
-		                        echo image_version
-		                        if (image_version.split(":")[1] == "master-${shortCommit}")
+		                        echo "Waiting for tag master-${shortCommit} to be deployed."
+		                        if (image_version.endsWith("master-${shortCommit}"))
 		                        {
 		                            updateOk = true
 		                            break;

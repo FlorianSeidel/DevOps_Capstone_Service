@@ -15,9 +15,9 @@ podTemplate(
             ],
         nodeSelector: 'role: builder',
         volumes: [
-                secretVolume(mountPath: '/home/jenkins/.aws/credentials', secretName: 'aws-credentials'),
-                configMapVolume(mountPath: '/home/jenkins/.aws/config', configMapName: 'aws-config'),
-                configMapVolume(mountPath: '/home/jenkins/.kube/config', configMapName: 'kube-config')
+                secretVolume(mountPath: '/home/jenkins/.aws', secretName: 'aws-credentials'),
+                configMapVolume(mountPath: '/home/jenkins/.aws', configMapName: 'aws-config'),
+                configMapVolume(mountPath: '/home/jenkins/.kube', configMapName: 'kube-config')
             ]
 )
 {
@@ -197,10 +197,6 @@ spec:
 	                {
 	                    stage("Acceptance tests")
 	                    {
-	                        sh "ls -ahl /home/jenkins/.kube/config"
-	                        sh "ls -ahl /home/jenkins/.aws/credentials"
-	                        sh "ls -ahl /home/jenkins/.aws"
-	                        sh "ls -ahl /home/jenkins/.aws/config"
 		                    // Flux will update image version to latest
 		                    shortCommit = sh(returnStdout: true, script: "git log -n 1 --pretty=format:'%h'").trim()
 		                    def updateOk = false

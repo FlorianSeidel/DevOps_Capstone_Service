@@ -13,7 +13,7 @@ podTemplate(
                                           ]
                                   )
             ],
-        nodeSelector: 'role: builder'//,
+        nodeSelector: 'role: builder',
         volumes: [
                 secretVolume(mountPath: '/home/jenkins/.aws', secretName: 'aws-credentials')
                 //configMapVolume(mountPath: '/home/jenkins/.aws', configMapName: 'aws-config'),
